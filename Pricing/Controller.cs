@@ -110,7 +110,7 @@ namespace Pricing
         public DataTable getItem_Dyes(string itemCode)
         {
             string query = "SELECT Materials.Material_Name As Material_Name, Item_Dyes.Quantity As Quantity," +
-                " [Materials Latest].Price As Price, Item_Dyes.[Dye/Chemicals] As Dyes " +
+                " [Materials Latest].Price As Price, Item_Dyes.[Dye/Chemicals] As Dyes,[Materials Latest].Currency " +
                 "FROM (Item_Dyes INNER JOIN [Materials Latest] ON Item_Dyes.Material_Code = [Materials Latest].Material_Code) " +
                 "INNER JOIN Materials ON Item_Dyes.Material_Code = Materials.Code " +
                 "where Item_Dyes.Item_Code = '" + itemCode + "';";
@@ -118,7 +118,7 @@ namespace Pricing
         }
         public DataTable getMaterialNameAndPrice(string materialCode)
         {
-            string query = "select Materials.MaterialDisplay as Name , [Materials Latest].Price As Price " +
+            string query = "select Materials.MaterialDisplay as Name , [Materials Latest].Price As Price,[Materials Latest].Currency " +
                 "from Materials INNER JOIN [Materials Latest] ON Materials.Code = [Materials Latest].Material_Code " +
                 "where Materials.Code = '" + materialCode + "';";
             return dbMan.ExecuteReader(query);

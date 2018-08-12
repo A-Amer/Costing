@@ -126,14 +126,24 @@ namespace Pricing
                 }
 
                 DataTable dyes = Program.programController.getItem_Dyes(itemComboBx.SelectedValue.ToString());
+                string materialCurrency;
                 if(dyes.Rows.Count!=0)              
                 {
                     reqChemicals[0] = pricingOrderID;
                     for (int i=0; i< dyes.Rows.Count; i++)
                     {
+                        materialCurrency = dyes.Rows[i]["Currency"].ToString();
                         reqChemicals[1] = dyes.Rows[i]["Material_Name"].ToString();
                         reqChemicals[2] = double.Parse(dyes.Rows[i]["Quantity"].ToString());
                         reqChemicals[3] = double.Parse(dyes.Rows[i]["Price"].ToString());
+                        if (materialCurrency == "USD")
+                        {
+                            reqChemicals[3] = double.Parse(pricingReqParams[9].ToString()) * double.Parse(reqChemicals[3].ToString());
+                        }
+                        else if (materialCurrency =="Euro")
+                        {
+                            reqChemicals[3] = double.Parse(pricingReqParams[9].ToString()) * euroRate;
+                        }
                         reqChemicals[4] = Boolean.Parse(dyes.Rows[i]["Dyes"].ToString());
                         if (Program.programController.addRequest_Chemicals(reqChemicals) <=0 )
                         {
@@ -174,7 +184,16 @@ namespace Pricing
                 {
                     materialNamePrice = Program.programController.getMaterialNameAndPrice(pair.Key);
                     name = materialNamePrice.Rows[0]["Name"].ToString();
-                    price = double.Parse(materialNamePrice.Rows[0]["price"].ToString());
+                    price = double.Parse(materialNamePrice.Rows[0]["Price"].ToString());
+                    materialCurrency = materialNamePrice.Rows[0]["Currency"].ToString();
+                    if (materialCurrency == "EGP")
+                    {
+                        reqChemicals[3] = double.Parse(pricingReqParams[9].ToString()) / double.Parse(reqChemicals[3].ToString());
+                    }
+                    else if (materialCurrency == "Euro")
+                    {
+                        reqChemicals[3] = (double.Parse(pricingReqParams[9].ToString()) * euroRate) / double.Parse(reqChemicals[3].ToString());
+                    }
                     if (Program.programController.addRequest_Materials(pricingOrderID, name, price, pair.Value) <= 0)
                     {                        
                         Program.programController.deleteRequest_Chemicals(pricingOrderID);
